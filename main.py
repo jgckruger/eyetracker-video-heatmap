@@ -1,0 +1,46 @@
+from heatmappy import Heatmapper, VideoHeatmapper
+from PIL import Image
+import pandas as pd
+import pandas as pd
+from sklearn import preprocessing
+from random import randint
+
+# TODO: get params from file
+# TODO: get input from params
+# TODO: remove out of bounds points
+# TODO: calculate time for different frames
+# TODO: add skip first lines param to Pandas
+# TODO: add skip last lines param to Pandas
+
+## Params
+TXT_IN_PATH = 'example/text_input/in.csv'
+IMG_IN_PATH = 'example/video_input/in.mp4'
+IMG_OP_PATH = 'example/video_output/out.mp4'
+IMG_FRAMERATE = 30
+TRK_FRAMERATE = 30
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+BITRATE = "5000k"
+SKIP_N_FIRST_LINES = 0
+SKIP_N_LAST_LINES = 0
+
+
+## Read file
+df = pd.read_csv(input_path, delimiter=";")
+df = df[["GazeX","GazeY","FrameNr"]]
+df['Timestamp'] = int(df['FrameNr']*1/TRK_FRAMERATE)
+df = df.drop(["FrameNr"],axis=1)
+records = df.to_records(index=False)
+heat_points = list(records)
+
+
+## Setup 
+img_heatmapper = Heatmapper()
+video_heatmapper = VideoHeatmapper(img_heatmapper)
+
+heatmap_video = video_heatmapper.heatmap_on_video_path(
+    video_path='teste.mp4',
+    points=heat_points
+)
+
+heatmap_video.write_videofile('ou2t.mp4', bitrate=BITRATE, fps=FRAMERATE)
