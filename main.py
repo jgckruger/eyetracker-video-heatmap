@@ -2,7 +2,6 @@ from heatmappy import Heatmapper, VideoHeatmapper
 from PIL import Image
 import pandas as pd
 import pandas as pd
-from sklearn import preprocessing
 from random import randint
 
 # TODO: get params from file
@@ -26,9 +25,9 @@ SKIP_N_LAST_LINES = 0
 
 
 ## Read file
-df = pd.read_csv(input_path, delimiter=";")
+df = pd.read_csv(TXT_IN_PATH, delimiter=";")
 df = df[["GazeX","GazeY","FrameNr"]]
-df['Timestamp'] = int(df['FrameNr']*1/TRK_FRAMERATE)
+df['Timestamp'] = (df['FrameNr']*1/TRK_FRAMERATE).astype(int)
 df = df.drop(["FrameNr"],axis=1)
 records = df.to_records(index=False)
 heat_points = list(records)
@@ -39,8 +38,8 @@ img_heatmapper = Heatmapper()
 video_heatmapper = VideoHeatmapper(img_heatmapper)
 
 heatmap_video = video_heatmapper.heatmap_on_video_path(
-    video_path='teste.mp4',
+    video_path=IMG_IN_PATH,
     points=heat_points
 )
 
-heatmap_video.write_videofile('ou2t.mp4', bitrate=BITRATE, fps=FRAMERATE)
+heatmap_video.write_videofile(IMG_OP_PATH, bitrate=BITRATE, fps=IMG_FRAMERATE)
