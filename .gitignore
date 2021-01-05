@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+example/video_input/*.mp4
+example/text_input/*.csv
+example/text_input/*.json

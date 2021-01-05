@@ -10,10 +10,11 @@ from random import randint
 # TODO: calculate time for different frames
 # TODO: add skip first lines param to Pandas
 # TODO: add skip last lines param to Pandas
+# TODO: merge multiple input files
 
 ## Params
-TXT_IN_PATH = 'example/text_input/in.csv'
-IMG_IN_PATH = 'example/video_input/in.mp4'
+TXT_IN_PATH = 'example/text_input/etr_1592956701406.csv'
+IMG_IN_PATH = 'example/video_input/video_sample.mp4'
 IMG_OP_PATH = 'example/video_output/out.mp4'
 IMG_FRAMERATE = 30
 TRK_FRAMERATE = 30
@@ -23,11 +24,10 @@ BITRATE = "5000k"
 SKIP_N_FIRST_LINES = 0
 SKIP_N_LAST_LINES = 0
 
-
 ## Read file
-df = pd.read_csv(TXT_IN_PATH, delimiter=";")
+df = pd.read_csv(TXT_IN_PATH)
 df = df[["GazeX","GazeY","FrameNr"]]
-df['Timestamp'] = (df['FrameNr']*1/TRK_FRAMERATE).astype(int)
+df['Timestamp'] = (df['FrameNr']*1/TRK_FRAMERATE).astype(int) * 100
 df = df.drop(["FrameNr"],axis=1)
 records = df.to_records(index=False)
 heat_points = list(records)
