@@ -15,7 +15,7 @@ from classes.heatmap import HeatMap
 
 ## Params
 TXT_IN_PATH = 'example/text_input/etr_1592956701406.csv'
-TXT_IN_PATH = 'example/text_input/etr_1592956701406.json'
+# TXT_IN_PATH = 'example/text_input/etr_1592956701406.json'
 IMG_IN_PATH = 'example/video_input/video_sample.mp4'
 IMG_OP_PATH = 'example/video_output/out.mp4'
 IMG_FRAMERATE = 30
