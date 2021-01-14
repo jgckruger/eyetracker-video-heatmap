@@ -26,7 +26,7 @@ class VideoHeatmapper:
         count = 0
         total_frames = self._get_number_of_frames(base_video)
 
-        fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter('output.mp4',fourcc, fps, (width,height))
         
         while base_video.isOpened():
@@ -38,7 +38,9 @@ class VideoHeatmapper:
             try:
                 heat_frame = next(heatmap_frames)
                 # TODO: correctly merge the RGBA and RGB frames
+                # TODO: merge audio
                 heat_mask = self._rgba2rgb(heat_frame[1])
+                # frame=cv2.cvtColor(frame, cv2.COLOR_RGB2RGBA)
                 new_img = cv2.addWeighted(frame, 0.5, heat_mask, 0.2, 0)
                 new_video_frames.append(new_img)
                 out.write(new_img)
