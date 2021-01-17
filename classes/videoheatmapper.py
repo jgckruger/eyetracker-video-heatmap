@@ -1,22 +1,26 @@
 import cv2
 import numpy as np
 from collections import defaultdict
+from moviepy.editor import VideoFileClip
+from PIL import Image
 
 class VideoHeatmapper:
     def __init__(self, img_heatmapper):
         self.img_heatmapper = img_heatmapper
 
-    def heatmap_on_video_path(self, video_path, points, heat_fps=25, keep_heat=True, heat_decay_s=None):
-        video = cv2.VideoCapture(video_path)
-        return self.heatmap_on_video(video, points, heat_fps, keep_heat, heat_decay_s)
+    def heatmap_on_video_path(self, video_path, output_path, points, heat_fps=None, keep_heat=True, heat_decay_s=None):
+        video = VideoFileClip(video_path)
+        return self.heatmap_on_video(video, output_path, points, heat_fps, keep_heat, heat_decay_s)
 
-    def heatmap_on_video(self, base_video, points, heat_fps, keep_heat, heat_decay_s):
-        width  = int(base_video.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(base_video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        fps = base_video.get(cv2.CAP_PROP_FPS)
+    def heatmap_on_video(self, video, output_path, points, heat_fps, keep_heat, heat_decay_s):
+        fps = video.fps
+        width = video.w
+        height = video.h
+        shape = (width, height)
+
         frame_points = self._frame_points(
             points,
-            fps=heat_fps or fps,
+            fps=heat_fps if heat_fps is not None else int(fps),
             keep_heat=keep_heat,
             heat_decay_s=heat_decay_s
         )
@@ -24,36 +28,30 @@ class VideoHeatmapper:
         
         new_video_frames = []
         count = 0
-        total_frames = self._get_number_of_frames(base_video)
+        total_frames = video.reader.nframes
 
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter('output.mp4',fourcc, fps, (width,height))
+        out = cv2.VideoWriter(output_path,fourcc, fps, (width, height))        
         
-        while base_video.isOpened():
-            ret,frame = base_video.read()
-            count += 1
-            print(str(int(count*100/total_frames)) + "/" + str(total_frames*100/total_frames))
-            if count > total_frames:
-                break
+        for frame in video.iter_frames(dtype='uint8'):
             try:
+                count+=1
+                print(count, total_frames)
                 heat_frame = next(heatmap_frames)
-                # TODO: correctly merge the RGBA and RGB frames
-                # TODO: merge audio
-                heat_mask = self._rgba2rgb(heat_frame[1])
-                # frame=cv2.cvtColor(frame, cv2.COLOR_RGB2RGBA)
-                new_img = cv2.addWeighted(frame, 0.5, heat_mask, 0.2, 0)
-                new_video_frames.append(new_img)
-                out.write(new_img)
+                A = heat_frame[1]
+
+                fg = Image.fromarray(heat_frame[1])
+                bg = Image.fromarray(frame)
+
+                bg.paste(fg, (0, 0), fg)
+
+                out.write(cv2.cvtColor(np.asarray(bg), cv2.COLOR_RGBA2BGR))
             except StopIteration as e:
-                new_video_frames.append(frame)
-                out.write(frame)
-
-        base_video.release()
-        out.release()
-
-
-        # TODO: GENERATE VIDEO FILE
-        return new_video_frames
+                out.write(cv2.cvtColor(np.asarray(frame), cv2.COLOR_RGBA2BGR))
+            
+            out.release()
+        
+        return ret
 
 
     def _heatmap_frames(self, width, height, frame_points):
@@ -83,12 +81,6 @@ class VideoHeatmapper:
                 frames[frame_time].append((x, y))
 
         return frames
-    
-    @staticmethod
-    def _get_number_of_frames(video_capture):
-        if cv2.__version__.startswith("4."): # OpenCV 3+
-            return int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-        return int(video_capture.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
 
     @staticmethod
     def _rgba2rgb( rgba, background=(255,255,255) ):
