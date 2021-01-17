@@ -49,9 +49,9 @@ class VideoHeatmapper:
             except StopIteration as e:
                 out.write(cv2.cvtColor(np.asarray(frame), cv2.COLOR_RGBA2BGR))
             
-            out.release()
+        out.release()
         
-        return ret
+        return True
 
 
     def _heatmap_frames(self, width, height, frame_points):
