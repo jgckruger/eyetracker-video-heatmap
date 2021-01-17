@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from collections import defaultdict
-from moviepy.editor import VideoFileClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
 from PIL import Image
 from pathlib import Path
 import os
