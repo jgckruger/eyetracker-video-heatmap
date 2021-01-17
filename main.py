@@ -82,10 +82,9 @@ parser.add_argument(
 
 parser.add_argument(
     '--keep_heat',
-    metavar = "",
-    type = bool,
-    help = 'boolean that dictates whether the points will fade over time. With --keep_heat=False, the output video will look like a eye-tracker rater than a heatmapper',
-    default = True
+    help = 'dictates whether the points will fade over time.',
+    default = False,
+    action="store_true"
 )
 
 parser.add_argument(
@@ -102,7 +101,16 @@ except:
     parser.print_help()
     sys.exit(0)
 
-df = pd.read_csv(options.data_in_path)
+df = None
+
+if options.data_in_path[-4:] == "json":
+    df = pd.read_csv(options.data_in_path)
+elif options.data_in_path[-3:] == "csv":
+    df = pd.read_csv(options.data_in_path)
+else:
+    raise ValueError('The input file must be of the type json or csv')
+    sys.exit(0)
+
 df.drop(df.head(options.skip_n_first_lines).index,inplace=True)
 df.drop(df.tail(options.skip_n_last_lines).index,inplace=True)
 

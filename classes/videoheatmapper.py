@@ -7,6 +7,7 @@ from pathlib import Path
 import os
 import string
 import random
+from progress.bar import Bar
 
 class VideoHeatmapper:
     def __init__(self, img_heatmapper):
@@ -35,17 +36,17 @@ class VideoHeatmapper:
         count = 0
         total_frames = video.reader.nframes
 
-
         random_string = self.random_string()
         Path("./temp").mkdir(parents=True, exist_ok=True)
         temp_file = './temp/' + random_string +'.mp4'
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(temp_file,fourcc, fps, (width, height))        
-        
+        bar = Bar('Processing Frames', max=total_frames, suffix='Progress = %(percent).1f%% - Time elapsed %(elapsed)ds - Time Remaining %(eta)ds')
+
         for frame in video.iter_frames(dtype='uint8'):
             try:
+                bar.next()
                 count+=1
-                print(count, total_frames)
                 heat_frame = next(heatmap_frames)
                 A = heat_frame[1]
 
@@ -57,7 +58,8 @@ class VideoHeatmapper:
                 out.write(cv2.cvtColor(np.asarray(bg), cv2.COLOR_RGBA2BGR))
             except StopIteration as e:
                 out.write(cv2.cvtColor(np.asarray(frame), cv2.COLOR_RGBA2BGR))
-            
+        bar.finish()
+        
         out.release()
 
         
