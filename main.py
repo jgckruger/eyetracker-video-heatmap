@@ -81,8 +81,8 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '--keep_heat',
-    help = 'dictates whether the points will fade over time.',
+    '--should_fade_heat',
+    help = 'dictates whether the last heatpoint should fade when a new heatpoint arrive',
     default = False,
     action="store_true"
 )
@@ -123,5 +123,5 @@ points = list(records)
 
 img_heatmapper = Heatmapper(colours=options.colours, point_strength=options.point_strength, point_diameter=options.point_diameter, opacity=options.point_opacity)
 video_heatmapper = VideoHeatmapper(img_heatmapper)
-video = video_heatmapper.heatmap_on_video_path(options.video_in_path, options.output_name, points, keep_heat=True, heat_decay_s=5)
+video = video_heatmapper.heatmap_on_video_path(options.video_in_path, options.output_name, points, keep_heat=not(options.should_fade_heat), heat_decay_s=options.heat_decay_s)
 
