@@ -2,10 +2,11 @@
 Creates heatmaps for videos from eyetracker data.
 
 # Running the code 
-You can use the built-in helper to run this program
+You can use the built-in helper to chek how to run this program
 ```
 python main.py
 ```
+The main usage is ```python PATH_TO_CSV_FILE.csv PATH_TO_INPUT_VIDEO.mp4 PATH_TO_OUTPUT_VIDEO.mp4```
 
 For example
 ```
