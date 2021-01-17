@@ -3,6 +3,10 @@ import numpy as np
 from collections import defaultdict
 from moviepy.editor import VideoFileClip
 from PIL import Image
+from pathlib import Path
+import os
+import string
+import random
 
 class VideoHeatmapper:
     def __init__(self, img_heatmapper):
@@ -17,6 +21,7 @@ class VideoHeatmapper:
         width = video.w
         height = video.h
         shape = (width, height)
+        audio = video.audio
 
         frame_points = self._frame_points(
             points,
@@ -30,8 +35,12 @@ class VideoHeatmapper:
         count = 0
         total_frames = video.reader.nframes
 
+
+        random_string = self.random_string()
+        Path("./temp").mkdir(parents=True, exist_ok=True)
+        temp_file = './temp/' + random_string +'.mp4'
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_path,fourcc, fps, (width, height))        
+        out = cv2.VideoWriter(temp_file,fourcc, fps, (width, height))        
         
         for frame in video.iter_frames(dtype='uint8'):
             try:
@@ -50,8 +59,18 @@ class VideoHeatmapper:
                 out.write(cv2.cvtColor(np.asarray(frame), cv2.COLOR_RGBA2BGR))
             
         out.release()
+
         
+        heatmap_video = VideoFileClip(temp_file)
+        heatmap_video = heatmap_video.set_audio(audio)
+        heatmap_video.write_videofile(output_path, bitrate="5000k", fps=fps)
+        os.remove(temp_file)
+
         return True
+
+    def random_string(self):
+        letters_and_digits = string.ascii_letters + string.digits
+        return ''.join((random.choice(letters_and_digits) for i in range(10)))
 
 
     def _heatmap_frames(self, width, height, frame_points):
