@@ -8,6 +8,7 @@ class Heatmapper:
     def __init__(self, point_diameter=50, point_strength=0.2, opacity=0.65,
                  colours='default'):
         """
+        :param point_diameter: diameter of the heat point
         :param opacity: opacity (between 0 and 1) of the generated heatmap overlay
         :param colours: Either 'default', 'reveal',
                         OR the path to horizontal image which will be converted to a scale
@@ -60,6 +61,8 @@ class Heatmapper:
 
     def heatmap(self, width, height, points, base_path=None, base_img=None):
         """
+        :param width: width of the image
+        :param height: height of the image
         :param points: sequence of tuples of (x, y), eg [(9, 20), (7, 3), (19, 12)]
         :return: If base_path of base_img provided, a heat map from the given points
                  is overlayed on the image. Otherwise, the heat map alone is returned
