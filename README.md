@@ -26,7 +26,7 @@ pip install -r requirements.txt
 ```
 
 # Building
-This repo uses pyinstaller for building. You need to build the application in the respective OS you need to run it (Linux/Mac/Windows)
+This repo uses pyinstaller for building. You need to build the application in the respective OS you need to run it (Linux/Mac/Windows). You'll also need to include the assets folder to the location of the executable.
 ```
 pyinstaller main.py
 ```
